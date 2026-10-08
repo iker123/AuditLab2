@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUDIT LAB 2 · UDABOL — Planifica tu auditoría</title>
+<style>
+:root{--bg:#07101c;--line:#29415f;--text:#edf6ff;--muted:#9db0c7;--cyan:#42d8ff;--green:#3dde8a;--yellow:#ffd166;--red:#ff647c;--purple:#a98cff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 10% 0%,#183856 0,#07101c 38%,#040912 100%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:10;background:rgba(4,9,18,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{max-width:1050px;margin:auto;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.brand{font-weight:900;letter-spacing:.08em}.brand span{color:var(--cyan)}
+.topscore{font-weight:800;color:var(--cyan);font-size:14px}
+main{max-width:1050px;margin:auto;padding:26px 20px 60px}
+.hidden{display:none!important}
+.card{background:linear-gradient(145deg,rgba(18,35,58,.97),rgba(9,18,31,.97));border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:0 18px 55px rgba(0,0,0,.22);margin-top:16px}
+.eyebrow{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:.17em}
+h1{font-size:clamp(30px,5vw,50px);line-height:1.02;margin:10px 0 12px}
+h2{margin:8px 0}
+.lead{font-size:17px;line-height:1.65;color:var(--muted)}
+input,textarea,select{width:100%;background:#071321;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--cyan)}
+textarea{min-height:84px;resize:vertical}
+button{border:0;border-radius:10px;padding:13px 18px;background:var(--cyan);color:#03101a;font-weight:900;cursor:pointer;font-size:15px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.note{padding:13px 15px;border:1px solid var(--line);border-radius:11px;background:#071321;color:var(--muted);line-height:1.55}
+.note.warn{border-color:var(--yellow);color:#ffe6a4}.note.good{border-color:var(--green);color:#bdf5d5}.note.bad{border-color:var(--red);color:#ffc3cc}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.casebox{border-left:4px solid var(--cyan);background:#0a1c2c;border-radius:10px;padding:18px;line-height:1.75;font-size:16px}
+.casebox b{color:var(--yellow)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.fact{background:#071321;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:14px;color:var(--muted)}
+.fact b{display:block;color:var(--text);font-size:15px;margin-bottom:3px}
+.options{display:grid;gap:9px;margin-top:10px}
+.option{padding:14px;border:1px solid var(--line);border-radius:10px;background:#071321;cursor:pointer;line-height:1.45}
+.option:hover{border-color:#6286aa}
+.option.selected{border-color:var(--yellow);background:#26351c;box-shadow:0 0 0 1px rgba(255,209,102,.25)}
+.checklist{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.check{display:flex;gap:11px;align-items:flex-start;padding:13px;border:1px solid var(--line);border-radius:12px;background:#071321;cursor:pointer;line-height:1.45;font-size:15px}
+.check:hover{border-color:#6286aa}
+.check .box{flex:0 0 24px;height:24px;border:2px solid var(--line);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#03101a;margin-top:1px}
+.check.selected{border-color:var(--yellow);background:#26351c}
+.check.selected .box{background:var(--yellow);border-color:var(--yellow)}
+.counter{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:#071321;font-weight:900}
+.counter.ok{border-color:var(--green);color:var(--green)}
+.counter.over{border-color:var(--red);color:var(--red)}
+.sit{background:#071321;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px}
+.sit p{margin:0 0 9px;line-height:1.5}
+.progress{height:8px;background:#071321;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:12px}
+.progress div{height:100%;background:var(--cyan);transition:.3s;width:0}
+.final-score{font-size:64px;font-weight:900;color:var(--cyan)}
+.review-item{padding:12px;border:1px solid var(--line);border-radius:10px;background:#0a1726;margin-top:8px;line-height:1.5;font-size:14px}
+.review-item.ok{border-color:var(--green)}.review-item.bad{border-color:var(--red)}.review-item.miss{border-color:var(--yellow)}
+.tagok{color:var(--green);font-weight:800}.tagbad{color:var(--red);font-weight:800}.tagmiss{color:var(--yellow);font-weight:800}
+.hint{font-size:12px;color:var(--muted);display:block;margin:3px 0 6px}
+.cc{display:block;text-align:right;font-size:11px;color:var(--muted)}.cc.ok{color:var(--green)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:800px){.two,.checklist,.facts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="nav"><div class="brand">🛡️ AUDIT <span>LAB 2</span> · UDABOL <small style="display:block;color:var(--muted);font-size:10px;letter-spacing:0">Docente: Ing. Iver Guerrero Ortiz</small></div><div class="topscore" id="headerScore">PLANIFICACIÓN</div></div></header>
+<main>
+
+<!-- INTRO -->
+<section id="intro">
+<div class="card">
+<div class="eyebrow">AUDITORÍA DE SISTEMAS · PRÁCTICA 02</div>
+<h1>Antes de auditar,<br><span style="color:var(--cyan)">hay que prepararse bien.</span></h1>
+<p class="lead">Una auditoría se gana o se pierde en la planificación. En esta práctica ustedes serán el equipo auditor: leerán el caso de una empresa, definirán qué auditar, elegirán cómo se preparan y qué técnica usarán para comprobar cada punto.</p>
+<div class="two">
+<label><b>Grupo</b>
+<select id="groupName"><option value="">Selecciona tu grupo</option>
+<option>Grupo 1</option><option>Grupo 2</option><option>Grupo 3</option><option>Grupo 4</option><option>Grupo 5</option><option>Grupo 6</option><option>Grupo 7</option><option>Grupo 8</option></select></label>
+<label><b>Integrantes</b><input id="studentName" placeholder="Nombres de los integrantes"></label>
+</div>
+<div style="margin-top:14px"><button onclick="start()">ENTRAR AL LAB 2 →</button></div>
+</div>
+<div class="card">
+<div class="eyebrow">REGLAS</div>
+<ul style="line-height:1.9;color:#cbd8e7;margin:8px 0 0">
+<li>🔎 Un solo celular o laptop por grupo. Trabajen juntos y discutan cada respuesta.</li>
+<li>⚠️ Hay acciones que <b>parecen</b> razonables pero un auditor no las haría. Piensen antes de marcar.</li>
+<li>🔒 Al enviar, el resultado queda registrado y no se puede repetir desde este dispositivo.</li>
+<li>📄 Valor: <b>20 puntos</b> (alcance 2 · acciones de preparación 8 · técnicas 6 · justificación 4).</li>
+</ul>
+</div>
+</section>
+
+<!-- MISION -->
+<section id="mission" class="hidden">
+<div class="progress"><div id="bar"></div></div>
+
+<div class="card">
+<div class="eyebrow">FASE 01 · EL CASO</div>
+<h2 style="font-size:28px">🏢 Distribuidora Andina SRL</h2>
+<div class="casebox">
+Empresa ficticia de La Paz que vende productos de limpieza a tiendas de barrio. Tiene <b>3 sucursales</b> y <b>12 empleados</b>. Usa un sistema de <b>ventas e inventario</b> conectado en red y emite <b>facturación electrónica</b>.<br><br>
+Los cajeros a veces <b>comparten un mismo usuario</b> “para no perder tiempo”. Los descuentos los autoriza el encargado <b>de palabra</b>, sin registro. El respaldo se hace en un <b>disco externo cuando alguien se acuerda</b>. Hace poco, el <b>inventario físico no coincidió</b> con el del sistema.<br><br>
+La gerencia los contrata como equipo auditor para revisar el sistema de ventas e inventario.
+</div>
+<div class="facts">
+<div class="fact"><b>👥 Usuarios</b>12 empleados, roles poco definidos</div>
+<div class="fact"><b>💾 Datos</b>Ventas, stock y facturas</div>
+<div class="fact"><b>⚠️ Señales</b>Usuario compartido · descuentos sin registro · respaldo irregular</div>
+</div>
+</div>
+
+<div class="card">
+<div class="eyebrow">FASE 02 · ALCANCE</div>
+<h2>¿Qué van a auditar?</h2>
+<p class="lead" style="font-size:15px;margin:0">Elijan el alcance más adecuado para este encargo.</p>
+<div class="options" id="scopeOptions"></div>
+</div>
+
+<div class="card">
+<div class="eyebrow">FASE 03 · PREPARACIÓN</div>
+<h2>Elijan las 8 acciones correctas para prepararse</h2>
+<p class="lead" style="font-size:15px;margin:0">De las 16 acciones, solo <b>8</b> son adecuadas para esta etapa. Marquen exactamente 8. Más adelante tendrán que explicar por qué descartaron otras.</p>
+<div class="checklist" id="checklist"></div>
+<div id="counter" class="counter">0 / 8 elegidas</div>
+</div>
+
+<div class="card">
+<div class="eyebrow">FASE 04 · TÉCNICA DEL AUDITOR</div>
+<h2>¿Cómo lo comprobarían?</h2>
+<p class="lead" style="font-size:15px;margin:0">Para cada situación, elijan la técnica que mejor produce evidencia.</p>
+<div id="techs"></div>
+</div>
+
+<div class="card">
+<div class="eyebrow">FASE 05 · JUSTIFICACIÓN</div>
+<h2>Expliquen dos descartes</h2>
+<p class="lead" style="font-size:15px;margin:0">Elijan dos acciones <b>que NO marcaron</b> y expliquen por qué un auditor no debería hacerlo (mínimo 30 caracteres).</p>
+<div class="two" style="margin-top:12px">
+<div><label><b>Acción descartada 1</b><select id="disc1" onchange="saveCurrent()"></select></label>
+<label style="display:block;margin-top:8px"><b>¿Por qué?</b><textarea id="why1" oninput="cnt(this,'c1');saveCurrent()"></textarea><small class="cc" id="c1">0/30</small></label></div>
+<div><label><b>Acción descartada 2</b><select id="disc2" onchange="saveCurrent()"></select></label>
+<label style="display:block;margin-top:8px"><b>¿Por qué?</b><textarea id="why2" oninput="cnt(this,'c2');saveCurrent()"></textarea><small class="cc" id="c2">0/30</small></label></div>
+</div>
+<div style="margin-top:16px"><button onclick="submitLab()">FINALIZAR Y ENVIAR</button></div>
+<div id="submitMsg" class="note hidden" style="margin-top:12px"></div>
+</div>
+</section>
+
+<!-- FINAL -->
+<section id="final" class="hidden">
+<div class="card">
+<div class="eyebrow">RESULTADO</div>
+<h1 style="font-size:40px">Planificación completada</h1>
+<p class="lead" id="finalIntro"></p>
+<div class="two">
+<div class="card" style="margin-top:0"><div class="eyebrow">PUNTAJE</div><div class="final-score" id="finalScore"></div><p id="finalBreakdown" class="lead" style="font-size:14px"></p></div>
+<div class="card" style="margin-top:0"><div class="eyebrow">RECUERDA</div><p class="lead" style="font-size:15px">Un buen auditor planifica antes de probar, pide evidencia en lugar de creer, trabaja con acceso de solo lectura y nunca altera los datos reales. La justificación de tus descartes será revisada por el docente.</p></div>
+</div>
+<div class="eyebrow" style="margin-top:20px">REVISIÓN DE TUS DECISIONES</div>
+<div id="review"></div>
+</div>
+<div class="note good" style="margin-top:16px">🔒 Esta práctica ya fue registrada. Al recargar, se conservará el resultado.</div>
+</section>
+</main>
+<footer>AUDIT LAB 2 · UDABOL · Práctica — 20 puntos<br><b>Docente: Ing. Iver Guerrero Ortiz</b></footer>
+
+<script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRYg1Dbn0ig521Bqe5m5zDn0PI-qbloRS5e7wSlweZ5yzVVNAkJxsK6uPZTWgWSpWQ/exec";
+const EMPRESA = "Distribuidora Andina SRL";
+
+/* ---------- Datos ---------- */
+const SCOPES = [
+ {id:"s1", t:"Todo el sistema informático de la empresa, incluidos planillas, correo y la página web."},
+ {id:"s2", t:"El sistema de ventas e inventario de las 3 sucursales, en un período definido de meses."},
+ {id:"s3", t:"Solo la sucursal más grande, revisando únicamente las ventas y sin tocar el inventario."},
+ {id:"s4", t:"La página web y las redes sociales de la empresa, porque es lo que ve el público."}
+];
+const SCOPE_OK = "s2";
+
+/* ok: true = acción adecuada. why = explicación para la revisión final */
+const ITEMS = [
+ {id:"c1", ok:true,  t:"Definir el alcance y los objetivos: ventas e inventario de las 3 sucursales.", why:"Sin alcance y objetivos claros la auditoría pierde foco. Es el primer paso de la planificación."},
+ {id:"c2", ok:true,  t:"Pedir el organigrama y la lista de usuarios, con los roles y permisos de cada uno.", why:"Permite entender quién hace qué y detectar usuarios o permisos que no corresponden."},
+ {id:"c3", ok:true,  t:"Leer las políticas y procedimientos sobre descuentos, accesos y respaldos.", why:"Son el criterio: lo que la empresa dice que debe ocurrir, para compararlo con lo que ocurre."},
+ {id:"c4", ok:true,  t:"Preparar un cuestionario de control interno adaptado a los riesgos de esta empresa.", why:"Un checklist propio, basado en los riesgos del caso, ordena la revisión."},
+ {id:"c5", ok:true,  t:"Solicitar una muestra de ventas y los registros de acceso de un período.", why:"Son evidencia objetiva para verificar permisos, duplicados y trazabilidad."},
+ {id:"c6", ok:true,  t:"Diseñar pruebas con datos de ejemplo en un ambiente de prueba, separado del real.", why:"Permite comprobar controles sin dañar ni alterar la información real."},
+ {id:"c7", ok:true,  t:"Acordar con la gerencia las fechas y un acceso de solo lectura al sistema.", why:"El auditor observa y no modifica; el acceso de solo lectura protege la evidencia."},
+ {id:"c8", ok:true,  t:"Identificar los riesgos principales según lo que cuenta el caso.", why:"Los riesgos (acceso no autorizado, duplicados, pérdida de datos) orientan qué probar."},
+ {id:"w1", ok:false, t:"Pedir al administrador su usuario y clave para revisar el sistema como él.", why:"El auditor nunca usa credenciales ajenas: se pierde la trazabilidad y la independencia."},
+ {id:"w2", ok:false, t:"Basar la revisión en una conversación con el gerente, que conoce mejor el negocio.", why:"Una entrevista sola no es evidencia suficiente; hay que contrastarla con documentos y registros."},
+ {id:"w3", ok:false, t:"Ir escribiendo el informe y las conclusiones antes de reunir la evidencia.", why:"Las conclusiones deben nacer de la evidencia, no antes de ella."},
+ {id:"w4", ok:false, t:"Probar los controles sobre la base de datos real, modificando algunos registros.", why:"Alterar datos reales puede dañar la operación y contaminar la evidencia. Se usa un ambiente de prueba."},
+ {id:"w5", ok:false, t:"Ampliar la revisión a todos los sistemas de la empresa, por si acaso.", why:"Salirse del alcance dispersa el trabajo y puede exceder lo autorizado por la gerencia."},
+ {id:"w6", ok:false, t:"Pedir al administrador que corrija el inventario antes de comenzar la revisión.", why:"Corregir antes de auditar borra justamente la evidencia que se quiere analizar."},
+ {id:"w7", ok:false, t:"Usar un cuestionario de internet tal cual, sin adaptarlo a la empresa.", why:"Un checklist genérico no considera los riesgos propios del caso."},
+ {id:"w8", ok:false, t:"Dejar la planificación para el final y empezar directamente con las pruebas.", why:"Sin planificación no hay objetivos, alcance ni criterios; se prueba sin rumbo."}
+];
+
+const TECH_OPTIONS = [
+ {id:"t_ent", t:"Entrevista"},
+ {id:"t_obs", t:"Observación directa"},
+ {id:"t_log", t:"Revisión de registros (logs) de acceso"},
+ {id:"t_xls", t:"Análisis de datos en Excel o Sheets"},
+ {id:"t_prueba", t:"Prueba con datos de ejemplo"},
+ {id:"t_rec", t:"Recálculo de operaciones"}
+];
+const SITUATIONS = [
+ {id:"x1", t:"Los cajeros comparten usuario y quieres saber quién hizo cada venta.", ok:"t_log", why:"Los registros de acceso muestran usuario, hora y operación; una entrevista no lo demuestra."},
+ {id:"x2", t:"Sospechas que hay ventas con cantidades negativas y facturas repetidas en 6 meses de datos.", ok:"t_xls", why:"Con una hoja de cálculo se filtran negativos y se buscan duplicados en pocos minutos."},
+ {id:"x3", t:"Quieres comprobar si el sistema bloquea una venta mayor al stock disponible.", ok:"t_prueba", why:"Se prueba el control directamente con datos de ejemplo y se observa el resultado."},
+ {id:"x4", t:"Quieres ver cómo se hace realmente el cierre de caja al final del día.", ok:"t_obs", why:"Observar el proceso muestra lo que realmente ocurre, que puede diferir de lo escrito."}
+];
+
+/* ---------- Utilidades ---------- */
+function seedFrom(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(arr,seedStr){const r=rng(seedFrom(seedStr));const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const $=id=>document.getElementById(id);
+function show(id){["intro","mission","final"].forEach(x=>$(x).classList.toggle("hidden",x!==id));window.scrollTo({top:0,behavior:"smooth"})}
+
+let group="",members="",state={scope:null,picked:[],tech:{},disc1:"",disc2:"",why1:"",why2:""};
+
+/* ---------- Inicio ---------- */
+function start(){
+ const g=$("groupName").value; const n=$("studentName").value.trim();
+ if(!g){alert("Selecciona tu grupo.");return}
+ if(!n){alert("Escribe los nombres de los integrantes.");return}
+ group=g;members=n;
+ const saved=load();
+ if(saved&&saved.submitted){renderFinal(saved);return}
+ if(saved&&saved.started){ if(!confirm("Este grupo ya tiene una práctica iniciada en este dispositivo. ¿Desean continuarla?"))return; state=saved.state||state; members=saved.members||members; }
+ renderMission(); show("mission"); saveCurrent();
+}
+function key(){return "auditLab2_"+group}
+function load(){try{return JSON.parse(localStorage.getItem(key())||"null")}catch(e){return null}}
+function saveCurrent(){
+ if(!group)return;
+ state.disc1=$("disc1")?$("disc1").value:state.disc1; state.disc2=$("disc2")?$("disc2").value:state.disc2;
+ state.why1=$("why1")?$("why1").value:state.why1; state.why2=$("why2")?$("why2").value:state.why2;
+ try{localStorage.setItem(key(),JSON.stringify({started:true,submitted:false,group,members,state}))}catch(e){}
+ updateBar();
+}
+
+/* ---------- Render ---------- */
+function renderMission(){
+ // alcance
+ const sc=shuffle(SCOPES,group+"|scope");
+ $("scopeOptions").innerHTML=sc.map(s=>`<div class="option ${state.scope===s.id?"selected":""}" data-id="${s.id}" onclick="pickScope('${s.id}')">${s.t}</div>`).join("");
+ // checklist
+ const it=shuffle(ITEMS,group+"|items");
+ $("checklist").innerHTML=it.map((x,i)=>`<div class="check ${state.picked.includes(x.id)?"selected":""}" data-id="${x.id}" onclick="toggleItem('${x.id}')"><div class="box">${state.picked.includes(x.id)?"✓":""}</div><div><b style="color:var(--muted)">${i+1}.</b> ${x.t}</div></div>`).join("");
+ updateCounter();
+ // tecnicas
+ const sits=shuffle(SITUATIONS,group+"|sits");
+ $("techs").innerHTML=sits.map(s=>{
+   const opts=shuffle(TECH_OPTIONS,group+"|"+s.id);
+   return `<div class="sit"><p>${s.t}</p><select data-sit="${s.id}" onchange="pickTech('${s.id}',this.value)"><option value="">Elige una técnica…</option>${opts.map(o=>`<option value="${o.id}" ${state.tech[s.id]===o.id?"selected":""}>${o.t}</option>`).join("")}</select></div>`}).join("");
+ refreshDiscard();
+ $("why1").value=state.why1||"";$("why2").value=state.why2||"";cnt($("why1"),"c1");cnt($("why2"),"c2");
+ updateBar();
+}
+function pickScope(id){state.scope=id;document.querySelectorAll("#scopeOptions .option").forEach(o=>o.classList.toggle("selected",o.dataset.id===id));saveCurrent()}
+function toggleItem(id){
+ const i=state.picked.indexOf(id);
+ if(i>=0)state.picked.splice(i,1); else state.picked.push(id);
+ document.querySelectorAll("#checklist .check").forEach(c=>{const on=state.picked.includes(c.dataset.id);c.classList.toggle("selected",on);c.querySelector(".box").textContent=on?"✓":""});
+ updateCounter(); refreshDiscard(); saveCurrent();
+}
+function updateCounter(){
+ const n=state.picked.length;const c=$("counter");c.textContent=n+" / 8 elegidas";
+ c.className="counter"+(n===8?" ok":n>8?" over":"");
+}
+function pickTech(sid,v){state.tech[sid]=v;saveCurrent()}
+function refreshDiscard(){
+ const notPicked=ITEMS.filter(x=>!state.picked.includes(x.id));
+ const ord=shuffle(notPicked,group+"|disc");
+ ["disc1","disc2"].forEach(id=>{
+   const cur=state[id]||"";
+   $(id).innerHTML=`<option value="">Elige una acción no marcada…</option>`+ord.map(x=>`<option value="${x.id}" ${cur===x.id?"selected":""}>${x.t.length>80?x.t.slice(0,77)+"…":x.t}</option>`).join("");
+ });
+}
+function cnt(el,id){const n=el.value.trim().length;const c=$(id);c.textContent=n+"/30";c.className="cc"+(n>=30?" ok":"")}
+function updateBar(){
+ const done=(state.scope?1:0)+(state.picked.length===8?1:0)+(Object.keys(state.tech).filter(k=>state.tech[k]).length===4?1:0)+(state.why1&&state.why1.trim().length>=30&&state.why2&&state.why2.trim().length>=30?1:0);
+ $("bar").style.width=(done/4*100)+"%";
+}
+
+/* ---------- Envío ---------- */
+async function submitLab(){
+ saveCurrent();
+ const msg=$("submitMsg");
+ const fail=t=>{msg.className="note bad";msg.textContent=t};
+ if(!state.scope)return fail("Elijan el alcance (Fase 02).");
+ if(state.picked.length!==8)return fail("Deben marcar exactamente 8 acciones (Fase 03). Ahora tienen "+state.picked.length+".");
+ if(Object.keys(state.tech).filter(k=>state.tech[k]).length<4)return fail("Elijan una técnica para cada situación (Fase 04).");
+ if(!state.disc1||!state.disc2||state.disc1===state.disc2)return fail("Elijan dos acciones descartadas distintas (Fase 05).");
+ if((state.why1||"").trim().length<30||(state.why2||"").trim().length<30)return fail("Cada justificación necesita al menos 30 caracteres.");
+
+ const scopeOk=state.scope===SCOPE_OK;
+ const hits=state.picked.filter(id=>ITEMS.find(x=>x.id===id).ok).length;
+ const techHits=SITUATIONS.filter(s=>state.tech[s.id]===s.ok).length;
+ const justPts=((state.why1.trim().length>=30)?2:0)+((state.why2.trim().length>=30)?2:0);
+ const score=(scopeOk?2:0)+hits+techHits*1.5+justPts;
+ const d1=ITEMS.find(x=>x.id===state.disc1),d2=ITEMS.find(x=>x.id===state.disc2);
+ const payload={
+  timestamp:new Date().toISOString(),lab:"Lab2",grupo:group,integrantes:members,empresa:EMPRESA,categoria:"PLANIFICACIÓN DE AUDITORÍA",puntos:score,
+  alcance_correcto:scopeOk,aciertos_checklist:hits,tecnicas_correctas:techHits,
+  acciones_elegidas:state.picked.map(id=>ITEMS.find(x=>x.id===id).t).join(" | "),
+  descarto1:d1.t,descarto1_era_correcta:d1.ok,justificacion1:state.why1.trim(),
+  descarto2:d2.t,descarto2_era_correcta:d2.ok,justificacion2:state.why2.trim(),
+  dictamen:"N/A"
+ };
+ msg.className="note warn";msg.textContent="📤 Registrando…";
+ try{
+  if(GOOGLE_SCRIPT_URL&&GOOGLE_SCRIPT_URL.indexOf("PEGAR")===-1){
+   await fetch(GOOGLE_SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+  }
+  const saved={started:true,submitted:true,group,members,state,score,scopeOk,hits,techHits,justPts};
+  localStorage.setItem(key(),JSON.stringify(saved));
+  renderFinal(saved);
+ }catch(err){msg.className="note bad";msg.textContent="❌ No se pudo registrar. No cierren la página y avisen al docente."}
+}
+
+/* ---------- Final ---------- */
+function renderFinal(saved){
+ group=saved.group;members=saved.members;state=saved.state;
+ const st=state;
+ const sc=SCOPES.find(x=>x.id===st.scope), scOk=st.scope===SCOPE_OK;
+ $("finalIntro").textContent=`${group} · ${members} · ${EMPRESA}`;
+ $("finalScore").textContent=`${saved.score}/20`;
+ $("finalBreakdown").innerHTML=`Alcance: ${scOk?2:0}/2 · Acciones: ${saved.hits}/8 · Técnicas: ${saved.techHits*1.5}/6 · Justificación: ${saved.justPts}/4`;
+ let h="";
+ h+=`<div class="review-item ${scOk?"ok":"bad"}"><b>Alcance.</b> Eligieron: ${sc?sc.t:"—"}<br>${scOk?'<span class="tagok">✔ Correcto.</span>':'<span class="tagbad">✘</span> Lo adecuado era: '+SCOPES.find(x=>x.id===SCOPE_OK).t}</div>`;
+ const order=shuffle(ITEMS,group+"|items");
+ order.forEach(x=>{
+  const picked=st.picked.includes(x.id);
+  let cls,tag;
+  if(picked&&x.ok){cls="ok";tag='<span class="tagok">✔ Bien elegida.</span>'}
+  else if(picked&&!x.ok){cls="bad";tag='<span class="tagbad">✘ No era adecuada.</span>'}
+  else if(!picked&&x.ok){cls="miss";tag='<span class="tagmiss">● Era adecuada y no la marcaron.</span>'}
+  else {cls="";tag='<span style="color:var(--muted)">✔ Bien descartada.</span>'}
+  h+=`<div class="review-item ${cls}">${x.t}<br>${tag} ${x.why}</div>`;
+ });
+ SITUATIONS.forEach(s=>{
+  const ch=TECH_OPTIONS.find(o=>o.id===st.tech[s.id]);const okT=TECH_OPTIONS.find(o=>o.id===s.ok);const good=st.tech[s.id]===s.ok;
+  h+=`<div class="review-item ${good?"ok":"bad"}"><b>Técnica:</b> ${s.t}<br>Eligieron: ${ch?ch.t:"—"} ${good?'<span class="tagok">✔</span>':'<span class="tagbad">✘</span> Mejor técnica: '+okT.t}<br>${s.why}</div>`;
+ });
+ const d1=ITEMS.find(x=>x.id===st.disc1),d2=ITEMS.find(x=>x.id===st.disc2);
+ h+=`<div class="review-item"><b>Sus justificaciones</b><br>1) ${d1?d1.t:""}<br><i>${st.why1}</i><br><br>2) ${d2?d2.t:""}<br><i>${st.why2}</i></div>`;
+ $("review").innerHTML=h;
+ show("final");
+}
+window.addEventListener("beforeunload",()=>{if(group&&!(load()||{}).submitted)saveCurrent()});
+</script>
+</body>
+</html>
